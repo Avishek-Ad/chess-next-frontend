@@ -45,7 +45,7 @@ const apiService = {
       })
         .then((response) => response.json())
         .then((json) => {
-          console.log("Response: ", json);
+          // console.log("Response: ", json);
           resolve(json);
         })
         .catch((error) => {

@@ -12,7 +12,7 @@ export default function useWebsocket(
     if (!socketid) return;
 
     // ws connection
-    const ws = new WebSocket(`${process.env.NEXT_WEBSOCKET_URL}/ws/chess/${socketid}/`);
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chess/${socketid}/`);
     wsRef.current = ws;
 
     // on ws connects
