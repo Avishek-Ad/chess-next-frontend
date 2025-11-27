@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Chess, Move, ShortMove } from "chess.js";
+import { Chess, Move } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import useWebsocket from "@/app/hooks/useWebsocket";
 import apiService from "@/app/services/apiService";
 import { useRouter } from "next/navigation";
 import useShowMessage from "@/app/hooks/useShowMessage";
+
+type ShortMove = string; // for example, "e2e4"
 
 function findKingSquare(game: Chess, color: "w" | "b") {
   const board = game.board();
