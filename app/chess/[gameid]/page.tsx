@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Chess, Move } from "chess.js";
+import { Chess, Move, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import useWebsocket from "@/app/hooks/useWebsocket";
 import apiService from "@/app/services/apiService";
 import { useRouter } from "next/navigation";
 import useShowMessage from "@/app/hooks/useShowMessage";
-
-type ShortMove = string; // for example, "e2e4"
 
 function findKingSquare(game: Chess, color: "w" | "b") {
   const board = game.board();
@@ -71,7 +69,7 @@ export default function ChessGame({
     }
   }
 
-  const onSquareClick = (square: string) => {
+  const onSquareClick = (square:Square) => {
     const piece = game.get(square);
 
     // Clear previous highlights
@@ -102,7 +100,7 @@ export default function ChessGame({
   };
 
   // Try to make a move; returns the move object if valid, otherwise null
-  const makeAMove = (move: ShortMove) => {
+  const makeAMove = (move:string) => {
     const result: Move | null = game.move(move);
 
     if (result !== null) {
@@ -158,7 +156,7 @@ export default function ChessGame({
   });
 
   // Called when a piece is dropped on the board
-  const onDrop = (sourceSquare: string, targetSquare: string) => {
+  const onDrop = (sourceSquare: Square, targetSquare: Square) => {
     const piece = game.get(sourceSquare); // returns { type: 'p', color: 'w' } or null
     if (!piece) return false; // no piece to move
 
