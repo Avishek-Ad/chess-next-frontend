@@ -19,7 +19,7 @@ export async function handleLogin(
   cookieStore.set("session_access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 3* 60 * 60, // three hour,
+    maxAge: 24* 60 * 60, // one day,
     path: "/",
   });
 

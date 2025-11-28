@@ -1,7 +1,7 @@
 "use client";
 import useShowMessage from "@/app/hooks/useShowMessage";
 import apiService from "@/app/services/apiService";
-import { LoaderCircle } from "lucide-react";
+import { ChessQueen, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, FormEvent, useEffect } from "react";
@@ -85,19 +85,28 @@ export default function CreateGame() {
               Choose Your Side
             </h2>
             <form className="space-y-5" onSubmit={handleCreateGame}>
-              <div className="flex gap-4 h-32">
+              <div className="flex gap-6 h-32">
                 {["white", "black"].map((side) => (
                   <button
                     key={side}
                     type="button"
                     onClick={() => setPlayAs(side as "white" | "black")}
-                    className={`flex-1 py-3 rounded-xl font-semibold transition ${
-                      playAs === side
-                        ? "bg-blue-600 text-white shadow-md"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl font-semibold transition-all duration-300 
+                        ${
+                          playAs === side
+                            ? "bg-linear-to-br from-blue-500 to-blue-700 text-white shadow-lg scale-105"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-200 hover:scale-105"
+                        } 
+                      `}
                   >
-                    {side.charAt(0).toUpperCase() + side.slice(1)}
+                    <ChessQueen
+                      className={`w-10 h-10 stroke-2 ${
+                        side === "white" ? "text-white" : "text-black"
+                      }`}
+                    />
+                    <span className="text-lg">
+                      {side.charAt(0).toUpperCase() + side.slice(1)}
+                    </span>
                   </button>
                 ))}
               </div>

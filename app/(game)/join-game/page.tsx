@@ -14,20 +14,24 @@ export default function JoinGame() {
   const handlesubmit = async (e: FormEvent) => {
     e.preventDefault();
     // console.log("joining a game");
-    const response = await apiService.postwithoutdata(
-      `/api/chess/join-game/${gameid}/`
-    );
-    // console.log(response);
-    if (response.detail === "Unauthorized") {
-      setMessage(true, "Please login first");
-      router.push(`/login/?next=${pathname}`);
-    }
-    else if (response.gameid) {
-      setMessage(false, response.message);
-      // go to the websocket connection
-      router.push(`chess/${gameid}`);
-    } else {
-      setMessage(true, "Invalid game id, Try another");
+    try {
+      const response = await apiService.postwithoutdata(
+        `/api/chess/join-game/${gameid}/`
+      );
+      // console.log(response);
+      if (response.detail === "Unauthorized") {
+        setMessage(true, "Please login first");
+        router.push(`/login/?next=${pathname}`);
+      } else if (response.gameid) {
+        setMessage(false, response.message);
+        // go to the websocket connection
+        router.push(`chess/${gameid}`);
+      } else {
+        setMessage(true, "Invalid game id, Try another");
+      }
+    } catch (err) {
+      console.error("Join game failed:", err);
+      setMessage(true, "Server unreachable. Try again later.");
     }
   };
   return (

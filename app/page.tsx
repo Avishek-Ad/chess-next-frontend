@@ -5,8 +5,23 @@ import apiService from "./services/apiService";
 import { getUserid } from "./lib/actions";
 
 export default async function Home() {
-  const response = await apiService.get("/api/auth/stats");
-  const userid = await getUserid();
+  let response = null;
+  let userid = null;
+
+  try {
+    response = await apiService.get("/api/auth/stats");
+    userid = await getUserid();
+  } catch (err) {
+    console.error("API fetch failed:", err);
+    // Optionally provide fallback values
+    response = {
+      username: "Guest",
+      total_game_played: 0,
+      total_game_win: 0,
+      total_game_loss: 0,
+      total_game_draw: 0,
+    };
+  }
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50">
       {/* Navbar */}
@@ -39,13 +54,13 @@ export default async function Home() {
               Join a Game
             </Link>
           </div>
-          <Link
-            href="#"
+          <button
+            disabled
             className="px-8 py-6 bg-green-600 text-white rounded-2xl text-lg font-semibold shadow-lg hover:bg-green-500 transition flex justify-center items-center"
           >
             Join a Random Game
             <sub className="text-xs pl-1">comming soon...</sub>
-          </Link>
+          </button>
         </div>
       </div>
     </div>

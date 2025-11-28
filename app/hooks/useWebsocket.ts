@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getAccessToken } from "../lib/actions";
 
 export default function useWebsocket(
   socketid: string,
@@ -11,34 +12,50 @@ export default function useWebsocket(
   useEffect(() => {
     if (!socketid) return;
 
-    // ws connection
-    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chess/${socketid}/`);
-    wsRef.current = ws;
+    let ws: WebSocket | null = null;
 
-    // on ws connects
-    ws.onopen = () => {
-      console.log("websocket connected: ", socketid);
+    const setupWebsocket = async () => {
+      const accessToken = await getAccessToken();
+
+      if (!accessToken) {
+        console.warn("Could not get access token. Aborting connection.");
+        return;
+      }
+      // ws connection
+      ws = new WebSocket(
+        `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chess/${socketid}/?token=${accessToken}`
+      );
+      wsRef.current = ws;
+
+      // on ws connects
+      ws.onopen = () => {
+        console.log("websocket connected: ", socketid);
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        onMessage(data);
+      };
+
+      // on ws disconnects
+      ws.onclose = () => {
+        console.log("Websocket disconnected");
+      };
+
+      // on ws errors
+      ws.onerror = (error) => {
+        console.log("Websocket error :", error);
+      };
     };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      onMessage(data);
-    };
-
-    // on ws disconnects
-    ws.onclose = () => {
-      console.log("Websocket disconnected");
-    };
-
-    // on ws errors
-    ws.onerror = (error) => {
-      console.log("Websocket error :", error);
-    };
+    setupWebsocket();
 
     // closes the connection when the component unmounts
     return () => {
-      console.log("Closing websocket.....");
-      ws.close();
+      if (ws) {
+        console.log("Closing websocket.....");
+        ws.close();
+      }
     };
   }, [socketid]);
 

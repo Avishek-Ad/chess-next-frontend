@@ -69,7 +69,7 @@ export default function ChessGame({
     }
   }
 
-  const onSquareClick = (square:Square) => {
+  const onSquareClick = (square: Square) => {
     const piece = game.get(square);
 
     // Clear previous highlights
@@ -100,11 +100,16 @@ export default function ChessGame({
   };
 
   // Try to make a move; returns the move object if valid, otherwise null
-  const makeAMove = (move:string) => {
-    const result: Move | null = game.move(move);
-
+  const makeAMove = (move: string): Move | null => {
+    let result: Move | null = null;
+    try {
+      result = game.move(move);
+    } catch (error) {
+      // console.warn("Illegal move attempted (caught by makeAMove):", error);
+      return null;
+    }
     if (result !== null) {
-      setPosition(game.fen()); // only update position if move is valid
+      setPosition(game.fen());
     }
 
     return result;
@@ -112,21 +117,36 @@ export default function ChessGame({
 
   const { sendMove } = useWebsocket(gameid, (data) => {
     // console.log("Move received from server:", data);
+    if (!game) {
+      // console.warn("Game not ready yet, buffering move:", data);
+      return;
+    }
 
     if (data.status == "finished" && data.winner) {
+      // close all active websocket for this user
       // handle id winner or looser
       // console.log("OVER : ", data);
-      setTimeout(() => {
-        router.push(`result/${gameid}`);
-      }, 4000);
+      router.push(`/chess/result/${gameid}`);
     }
     if (!data.move) return;
 
-    // getting the latest
-    const currentOrientation = orientationRef.current;
-    // donot try to reapply my own move
-    if (data.move.player === currentOrientation) {
-      // console.log("NOT APPLYING MY OWN MOVE", currentOrientation, turn);
+    // only applying the correct moves
+    const receivedMovePlayer = data.move.player; // Assuming "white" or "black"
+    const currentOrientation = orientationRef.current; // Your assigned color ("white" or "black")
+    const expectedTurn = game.turn() === "w" ? "white" : "black"; // The player chess.js expects to move next
+
+    // 1. SKIP Check: Don't reapply my own move
+    if (receivedMovePlayer === currentOrientation) {
+      // console.log("NOT APPLYING MY OWN MOVE", currentOrientation, expectedTurn);
+      return;
+    }
+
+    // 2. TURN Check: The move received *must* belong to the player whose turn it is
+    if (receivedMovePlayer !== expectedTurn) {
+      // console.warn(
+      //   `Turn Mismatch: Received a move from ${receivedMovePlayer} but chess.js expects ${expectedTurn}. The client state is likely out of sync.`
+      // );
+      // You may need to request the FEN from the server here to resync the game.
       return;
     }
 
@@ -143,6 +163,7 @@ export default function ChessGame({
     ) {
       moveInfo.promotion = "q";
     }
+    // console.log("WHY INVALID: ", moveInfo);
     game.move(moveInfo);
     setPosition(game.fen());
 
@@ -191,7 +212,15 @@ export default function ChessGame({
     }
     const move = makeAMove(moveInfo);
 
-    if (!move) return false; // illegal move
+    // if (!move) return false; // illegal move
+    if (!move) {
+      // ⬅️ This handles the illegal move case
+      setMessage(
+        true,
+        `(${sourceSquare} -> ${targetSquare}) That is an illegal move!`
+      );
+      return false; // illegal move
+    }
 
     // Sends move to the server (((in later version also send promotion to which piece)))
     sendMove({
@@ -209,10 +238,10 @@ export default function ChessGame({
 
     // whose turn is next
     const nextTurn = game.turn() === "w" ? "white" : "black";
-    // console.log("WHOSE TURN IS IT", nextTurn);
+    // console.log("WHOSE TURN IS IT, LOCAL CHECK", nextTurn);
     setTurn(nextTurn);
 
-    // console.log("Move made:", move);
+    // console.log("Move made, LOCAL CHECK:", move);
     return true;
   };
 
