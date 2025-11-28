@@ -29,7 +29,7 @@ export default function useWebsocket(
 
       // on ws connects
       ws.onopen = () => {
-        console.log("websocket connected: ", socketid);
+        console.log("websocket connected:");
       };
 
       ws.onmessage = (event) => {

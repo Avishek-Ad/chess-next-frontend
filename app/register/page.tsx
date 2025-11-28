@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import apiService from "../services/apiService";
 import { useRouter } from "next/navigation";
 import useShowMessage from "../hooks/useShowMessage";
+import Link from "next/link";
 
 const Signup = () => {
   const router = useRouter();
@@ -83,9 +84,9 @@ const Signup = () => {
         </form>
         <p className="text-xs text-gray-500 mt-4 text-center">
           {`Don't`} have an account?{" "}
-          <a href="/login" className="text-airbnb font-medium hover:underline">
-            Login
-          </a>
+          <Link href="/login" className="text-airbnb font-medium hover:underline">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>

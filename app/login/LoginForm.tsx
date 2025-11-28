@@ -5,6 +5,7 @@ import apiService from "../services/apiService";
 import { useRouter, useSearchParams } from "next/navigation";
 import { handleLogin } from "../lib/actions";
 import useShowMessage from "../hooks/useShowMessage";
+import Link from "next/link";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -74,12 +75,12 @@ const LoginForm = () => {
         </form>
         <p className="text-xs text-gray-500 mt-4 text-center">
           {`Don't`} have an account?{" "}
-          <a
+          <Link
             href="/register"
             className="text-airbnb font-medium hover:underline"
           >
-            Sign up
-          </a>
+            Log in
+          </Link>
         </p>
       </div>
     </div>
