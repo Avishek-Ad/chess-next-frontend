@@ -135,18 +135,19 @@ export default function ChessGame({
     const currentOrientation = orientationRef.current; // Your assigned color ("white" or "black")
     const expectedTurn = game.turn() === "w" ? "white" : "black"; // The player chess.js expects to move next
 
-    // 1. SKIP Check: Don't reapply my own move
+    // Donot reapply my own move
     if (receivedMovePlayer === currentOrientation) {
       // console.log("NOT APPLYING MY OWN MOVE", currentOrientation, expectedTurn);
       return;
     }
 
-    // 2. TURN Check: The move received *must* belong to the player whose turn it is
+    // The move received *must* belong to the player whose turn it is
     if (receivedMovePlayer !== expectedTurn) {
       // console.warn(
       //   `Turn Mismatch: Received a move from ${receivedMovePlayer} but chess.js expects ${expectedTurn}. The client state is likely out of sync.`
       // );
-      // You may need to request the FEN from the server here to resync the game.
+      // LATER
+      // may need to request the FEN from the server here to resync the game.
       return;
     }
 
@@ -156,7 +157,7 @@ export default function ChessGame({
       to: data.move.to,
     };
 
-    // Only promote if the pawn reaches the last rank
+    // Only promotes if the pawn reaches the last rank
     if (
       data.move.piece === "p" &&
       (data.move.to.endsWith("8") || data.move.to.endsWith("1"))
@@ -214,7 +215,7 @@ export default function ChessGame({
 
     // if (!move) return false; // illegal move
     if (!move) {
-      // ⬅️ This handles the illegal move case
+      // This handles the illegal move case
       setMessage(
         true,
         `(${sourceSquare} -> ${targetSquare}) That is an illegal move!`
@@ -222,7 +223,7 @@ export default function ChessGame({
       return false; // illegal move
     }
 
-    // Sends move to the server (((in later version also send promotion to which piece)))
+    // Sending move to the server (((in later version also will send promotion to which piece)))
     sendMove({
       from: sourceSquare,
       to: targetSquare,
@@ -279,7 +280,7 @@ export default function ChessGame({
         <Chessboard
           position={position}
           onPieceDrop={onDrop}
-          onSquareClick={onSquareClick} // <-- ADD THIS
+          onSquareClick={onSquareClick}
           boardOrientation={orientation}
           animationDuration={200}
           customSquareStyles={{
