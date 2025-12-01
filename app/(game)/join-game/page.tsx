@@ -9,10 +9,11 @@ export default function JoinGame() {
   const router = useRouter();
   const pathname = usePathname();
   const { setMessage } = useShowMessage();
-  const [gameid, setGameid] = useState("");
+  const [gameid, setGameid] = useState(localStorage.getItem("gameid") ?? "");
 
   const handlesubmit = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("gameid", gameid);
     // console.log("joining a game");
     try {
       const response = await apiService.postwithoutdata(
@@ -23,6 +24,7 @@ export default function JoinGame() {
         setMessage(true, "Please login first");
         router.push(`/login/?next=${pathname}`);
       } else if (response.gameid) {
+        localStorage.removeItem("gameid");
         setMessage(false, response.message);
         // go to the websocket connection
         router.push(`chess/${gameid}`);
@@ -43,6 +45,7 @@ export default function JoinGame() {
         <form className="space-y-4" onSubmit={(e) => handlesubmit(e)}>
           <input
             required
+            value={gameid}
             onChange={(e) => setGameid(e.target.value)}
             type="text"
             className="w-full px-4 py-3 border text-black border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-airbnb transition"
