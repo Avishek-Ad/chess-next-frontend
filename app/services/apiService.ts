@@ -1,9 +1,9 @@
-import { getAccessToken } from "../lib/actions";
+import { getAccessToken, getRefreshToken } from "../lib/actions";
 
 const getHeaders = async () => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    Accept: "application/json",
   };
   const accessToken = await getAccessToken();
   if (accessToken) {
@@ -49,8 +49,8 @@ const apiService = {
           resolve(json);
         })
         .catch((error) => {
-          
-          reject(error)});
+          reject(error);
+        });
     });
   },
 
@@ -67,6 +67,30 @@ const apiService = {
         .then((response) => response.json())
         .then((json) => {
           // console.log("Response: ", json);
+          resolve(json);
+        })
+        .catch((error) => reject(error));
+    });
+  },
+
+  refresh: async function (url: string): Promise<any> {
+    // console.log("post", url);
+
+    const refreshToken = await getRefreshToken();
+
+    return new Promise((resolve, reject) => {
+      fetch(`${process.env.NEXT_PUBLIC_API_HOST}${url}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
+      })
+        .then((response) => response.json())
+        .then((json) => {
           resolve(json);
         })
         .catch((error) => reject(error));

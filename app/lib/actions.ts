@@ -3,40 +3,23 @@
 import { cookies } from "next/headers";
 
 export async function handleRefresh() {
-  console.log("handle refresh");
-  const cookieStore = await cookies();
-
-  const refreshToken = await getRefreshToken();
-
-  const token = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/token/refresh/`, {
-    method: "POST",
-    body: JSON.stringify({
-      refresh: refreshToken,
-    }),
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((json) => {
-      console.log("Response - refresh:", json);
-      if (json.access) {
-        cookieStore.set("session_access_token", json.access, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 60 * 60, // one hour,
-          path: "/",
-        });
-        return json.access;
-      } else {
-        resetAuthCookies();
-      }
-    })
-    .catch((error) => {
-      console.log("error", error);
-    });
-  return token;
+  // console.log("handle refresh");
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_SELF_URL}/api/refresh`,
+    { method: "POST" }
+  );
+  let responseData = null;
+  try {
+    responseData = await response.json();
+  } catch (e) {
+    console.error("Failed to parse JSON from /api/refresh:", e);
+    return null; // refresh failed
+  }
+  if (responseData.access) {
+    return responseData.access;
+  } else {
+    return null;
+  }
 }
 
 export async function handleLogin(
@@ -56,7 +39,7 @@ export async function handleLogin(
   cookieStore.set("session_access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 24* 60 * 60, // one day,
+    maxAge: 60 * 60, // one hour,
     path: "/",
   });
 
@@ -74,6 +57,16 @@ export async function resetAuthCookies() {
   cookieStore.set("session_userid", "");
   cookieStore.set("session_access_token", "");
   cookieStore.set("session_refresh_token", "");
+}
+
+export async function setAccessCookie(accessToken: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("session_access_token", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60, // one hour,
+    path: "/",
+  });
 }
 
 export async function getUserid() {
