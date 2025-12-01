@@ -3,13 +3,18 @@ import useShowMessage from "@/app/hooks/useShowMessage";
 import apiService from "@/app/services/apiService";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function JoinGame() {
   const router = useRouter();
   const pathname = usePathname();
   const { setMessage } = useShowMessage();
-  const [gameid, setGameid] = useState(localStorage.getItem("gameid") ?? "");
+  const [gameid, setGameid] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("gameid");
+    if (saved) setGameid(saved);
+  }, []);
 
   const handlesubmit = async (e: FormEvent) => {
     e.preventDefault();
