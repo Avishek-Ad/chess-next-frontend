@@ -77,6 +77,7 @@ const apiService = {
     // console.log("post", url);
 
     const refreshToken = await getRefreshToken();
+    console.log("inside apiservice to call main server to refresh token", refreshToken)
 
     return new Promise((resolve, reject) => {
       fetch(`${process.env.NEXT_PUBLIC_API_HOST}${url}`, {

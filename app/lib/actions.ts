@@ -3,21 +3,24 @@
 import { cookies } from "next/headers";
 
 export async function handleRefresh() {
-  // console.log("handle refresh");
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SELF_URL}/api/refresh`,
-    { method: "POST" }
+  console.log(
+    "inside handle refresh calling local server to call the main server"
   );
-  let responseData = null;
   try {
-    responseData = await response.json();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SELF_URL}/api/refresh`,
+      {
+        method: "POST",
+      }
+    );
+    if (!response.ok) {
+      console.error("Refresh request failed:", response.status);
+      return null;
+    }
+    const data = await response.json();
+    return data.access ?? null;
   } catch (e) {
-    console.error("Failed to parse JSON from /api/refresh:", e);
-    return null; // refresh failed
-  }
-  if (responseData.access) {
-    return responseData.access;
-  } else {
+    console.error("Failed to fetch /api/refresh:", e);
     return null;
   }
 }
@@ -81,6 +84,7 @@ export async function getAccessToken() {
 
   let accessToken = cookieStore.get("session_access_token")?.value;
   if (!accessToken) {
+    console.log("access token not found attempting refresh");
     accessToken = await handleRefresh();
   }
   return accessToken ? accessToken : null;
@@ -90,5 +94,6 @@ export async function getRefreshToken() {
   const cookieStore = await cookies();
 
   const refreshToken = cookieStore.get("session_refresh_token")?.value;
+  console.log("inside get refresh token", cookieStore.get("session_userid"));
   return refreshToken ? refreshToken : null;
 }

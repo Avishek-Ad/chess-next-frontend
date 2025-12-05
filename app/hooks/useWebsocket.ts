@@ -4,13 +4,13 @@ import { useEffect, useRef } from "react";
 import { getAccessToken } from "../lib/actions";
 
 export default function useWebsocket(
-  socketid: string,
+  url: string,
   onMessage: (data: any) => void
 ) {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!socketid) return;
+    if (!url) return;
 
     let ws: WebSocket | null = null;
 
@@ -23,13 +23,13 @@ export default function useWebsocket(
       }
       // ws connection
       ws = new WebSocket(
-        `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/ws/chess/${socketid}/?token=${accessToken}`
+        `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}${url}?token=${accessToken}`
       );
       wsRef.current = ws;
 
       // on ws connects
       ws.onopen = () => {
-        console.log("websocket connected:");
+        console.log("websocket connected:", url);
       };
 
       ws.onmessage = (event) => {
@@ -39,7 +39,7 @@ export default function useWebsocket(
 
       // on ws disconnects
       ws.onclose = () => {
-        console.log("Websocket disconnected");
+        console.log("Websocket disconnected", url);
       };
 
       // on ws errors
@@ -57,7 +57,7 @@ export default function useWebsocket(
         ws.close();
       }
     };
-  }, [socketid]);
+  }, [url]);
 
   // this function sends data to the server
   const sendMove = (data: any) => {

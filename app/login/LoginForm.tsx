@@ -79,7 +79,7 @@ const LoginForm = () => {
             href="/register"
             className="text-airbnb font-medium hover:underline"
           >
-            Log in
+            Register
           </Link>
         </p>
       </div>

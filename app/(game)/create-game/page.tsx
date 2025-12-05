@@ -16,6 +16,7 @@ export default function CreateGame() {
 
   // console.log(pathname);
 
+  // currently we are polling the serverin later version will use websocket
   useEffect(() => {
     if (!gameid) return;
 

@@ -85,7 +85,7 @@ const Signup = () => {
         <p className="text-xs text-gray-500 mt-4 text-center">
           {`Don't`} have an account?{" "}
           <Link href="/login" className="text-airbnb font-medium hover:underline">
-            Sign up
+            Login
           </Link>
         </p>
       </div>

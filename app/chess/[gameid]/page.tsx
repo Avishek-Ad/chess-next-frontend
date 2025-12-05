@@ -7,6 +7,7 @@ import useWebsocket from "@/app/hooks/useWebsocket";
 import apiService from "@/app/services/apiService";
 import { useRouter } from "next/navigation";
 import useShowMessage from "@/app/hooks/useShowMessage";
+import useRedirectBackToHome from "@/app/hooks/useRedirectBackToHome";
 
 function findKingSquare(game: Chess, color: "w" | "b") {
   const board = game.board();
@@ -115,7 +116,7 @@ export default function ChessGame({
     return result;
   };
 
-  const { sendMove } = useWebsocket(gameid, (data) => {
+  const { sendMove } = useWebsocket(`/ws/chess/${gameid}/`, (data) => {
     // console.log("Move received from server:", data);
     if (!game) {
       // console.warn("Game not ready yet, buffering move:", data);
@@ -245,6 +246,9 @@ export default function ChessGame({
     // console.log("Move made, LOCAL CHECK:", move);
     return true;
   };
+
+  // When the user quits by pressing the back button on browser redirect to home page
+  useRedirectBackToHome();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">

@@ -4,13 +4,18 @@ import { resetAuthCookies } from "../lib/actions";
 
 interface NavbarProps {
   userid: string | null;
-  username: string;
+  username: string | undefined;
+  setLogoutTriggered: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Navbar({userid, username}:NavbarProps) {
-
+export default function Navbar({
+  userid,
+  username,
+  setLogoutTriggered,
+}: NavbarProps) {
   const handleLogout = async () => {
     await resetAuthCookies();
+    setLogoutTriggered((prev) => !prev);
   };
   return (
     <nav className="w-full bg-gray-100 shadow-md px-6 py-4 flex justify-between items-center">
@@ -37,7 +42,7 @@ export default function Navbar({userid, username}:NavbarProps) {
               Login
             </Link>
             <Link
-              href="/signup"
+              href="/register"
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
             >
               Signup
