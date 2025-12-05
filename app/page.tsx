@@ -102,7 +102,6 @@ export default function Home() {
             className="px-8 py-6 bg-green-600 text-white rounded-2xl text-lg font-semibold shadow-lg hover:bg-green-500 transition flex justify-center items-center"
           >
             Join a Random Game
-            <sub className="text-xs pl-1">coming soon...</sub>
           </button>
         </div>
       </div>
