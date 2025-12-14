@@ -42,7 +42,7 @@ export async function handleLogin(
   cookieStore.set("session_access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60, // one hour,
+    maxAge: 60 * 60 * 24, // one day,
     path: "/",
   });
 
@@ -67,7 +67,7 @@ export async function setAccessCookie(accessToken: string) {
   cookieStore.set("session_access_token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60, // one hour,
+    maxAge: 60 * 60 * 24, // one day,
     path: "/",
   });
 }
