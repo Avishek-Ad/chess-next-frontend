@@ -8,6 +8,7 @@ import apiService from "@/app/services/apiService";
 import { useRouter } from "next/navigation";
 import useShowMessage from "@/app/hooks/useShowMessage";
 import useRedirectBackToHome from "@/app/hooks/useRedirectBackToHome";
+import { ChessQueen } from "lucide-react";
 
 function findKingSquare(game: Chess, color: "w" | "b") {
   const board = game.board();
@@ -129,6 +130,16 @@ export default function ChessGame({
       // console.log("OVER : ", data);
       router.push(`/chess/result/${gameid}`);
     }
+
+    if (data.fen && position !== data.fen) {
+      // console.log("GAME FEN RECEIVED and its different: ", data.fen);
+      game.load(data.fen);
+      setPosition(data.fen);
+      const nextTurn = game.turn() === "w" ? "white" : "black";
+      setTurn(nextTurn);
+      checkForChecks();
+    }
+
     if (!data.move) return;
 
     // only applying the correct moves
@@ -248,36 +259,102 @@ export default function ChessGame({
   };
 
   // When the user quits by pressing the back button on browser redirect to home page
-  useRedirectBackToHome();
+  // useRedirectBackToHome();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       {/* Participants & Turn Indicator */}
-      <div className="w-full max-w-xl flex justify-between items-center mb-4 px-4">
-        {/* White Player Indicator */}
+      <div className="w-full max-w-xl flex justify-between items-center mb-3 px-4">
+        {/* --- White Player --- */}
         <div
-          className={`font-bold text-white px-4 py-2 rounded-xl ${
-            turn === "white" ? "bg-green-600" : "bg-gray-400"
-          }`}
+          className={`
+      relative flex items-center gap-3 px-6 py-3 rounded-2xl transition-all duration-300 ease-in-out border-2
+      ${
+        turn === "white"
+          ? "bg-white text-gray-900 scale-110 shadow-[0_0_20px_rgba(255,255,255,0.4)] border-green-500 z-10"
+          : "bg-gray-800 text-gray-400 opacity-50 border-transparent scale-100 grayscale"
+      }
+    `}
         >
-          White: {players.white}
-          {turn === "white" && orientation === "white" && (
-            <span className="ml-1 text-sm">← Your turn</span>
+          {/* White Icon */}
+          <div
+            className={`p-2 rounded-full ${
+              turn === "white" ? "bg-gray-100" : "bg-gray-700"
+            }`}
+          >
+            <ChessQueen />
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-xs font-uppercase tracking-wider font-semibold opacity-70">
+              White
+            </span>
+            <span className="font-bold text-lg leading-none">
+              {players.white}
+            </span>
+          </div>
+
+          {/* Turn Indicator border and dot */}
+          {turn === "white" && (
+            <span className="absolute -top-2 -right-2 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500"></span>
+            </span>
           )}
         </div>
 
-        {/* Black Player Indicator */}
+        {/* --- VS --- */}
+        <div className="text-gray-500 font-bold text-sm italic opacity-30">
+          VS
+        </div>
+
+        {/* --- Black Player --- */}
         <div
-          className={`font-bold text-white px-4 py-2 rounded-xl ${
-            turn === "black" ? "bg-green-600" : "bg-gray-300"
-          }`}
+          className={`
+      relative flex items-center gap-3 px-6 py-1 rounded-2xl transition-all duration-300 ease-in-out border-2
+      ${
+        turn === "black"
+          ? "bg-gray-900 text-white scale-110 shadow-[0_0_20px_rgba(0,0,0,0.5)] border-green-500 z-10"
+          : "bg-gray-800 text-gray-400 opacity-50 border-transparent scale-100 grayscale"
+      }
+    `}
         >
-          Black: {players.black}
-          {turn === "black" && orientation === "black" && (
-            <span className="ml-1 text-sm">← Your turn</span>
+          <div className="flex flex-col items-end">
+            <span className="text-xs font-uppercase tracking-wider font-semibold opacity-70">
+              Black
+            </span>
+            <span className="font-bold text-lg leading-none">
+              {players.black}
+            </span>
+          </div>
+
+          {/* Black Icon */}
+          <div
+            className={`p-2 rounded-full ${
+              turn === "black"
+                ? "bg-gray-800 border border-gray-700"
+                : "bg-gray-700"
+            }`}
+          >
+            <ChessQueen />
+          </div>
+
+          {/* Turn Indicator border and dot */}
+          {turn === "black" && (
+            <span className="absolute -top-2 -left-2 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500"></span>
+            </span>
           )}
         </div>
       </div>
+
+      {/* Orientation/User Feedback whose turn is it */}
+      {orientation === turn && (
+        <div className="text-center text-green-400 font-bold mb-4 animate-pulse">
+          It is your turn!
+        </div>
+      )}
 
       {/* Chessboard */}
       <div className="w-full max-w-xl flex justify-center bg-white rounded-lg shadow-lg">
