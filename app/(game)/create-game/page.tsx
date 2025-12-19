@@ -78,7 +78,7 @@ export default function CreateGame() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-200 via-gray-200 to-zinc-300">
       <div className="w-full max-w-md mx-auto bg-white p-6 rounded-2xl shadow-lg">
         {gameid === "" ? (
           <>

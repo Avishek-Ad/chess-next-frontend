@@ -27,7 +27,7 @@ export default function MessageWrapper({ children }: MessageWrapperProps) {
     <div className="relative">
       {/* Toast notification */}
       <div
-        className={`fixed top-0 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-xl shadow-md text-sm transition-all duration-300 z-50
+        className={`fixed top-0 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-xl shadow-md text-sm transition-all duration-300 z-[9999]
           ${isError ? "bg-red-400 text-white font-semibold" : "bg-green-400 text-white font-semibold"}
           ${visible ? "translate-y-5 opacity-100" : "-translate-y-20 opacity-0"}
         `}
