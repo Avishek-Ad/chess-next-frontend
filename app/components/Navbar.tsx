@@ -17,10 +17,11 @@ export default function Navbar({
     await resetAuthCookies();
     setLogoutTriggered((prev) => !prev);
   };
+
   return (
-    <nav className="w-full bg-gray-100 shadow-md px-6 py-4 flex justify-between items-center">
+    <nav className="w-full bg-linear-to-r from-gray-50 to-gray-100 shadow-lg px-6 py-4 flex justify-between items-center sticky top-0 z-40">
       {/* Left side: Hello Guest */}
-      <div className="text-gray-700 text-2xl font-semibold">
+      <div className="text-gray-800 text-2xl font-bold tracking-wide">
         Hello, {userid && username ? username : "Guest"}
       </div>
 
@@ -29,7 +30,7 @@ export default function Navbar({
         {userid && username ? (
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            className="px-5 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105"
           >
             Logout
           </button>
@@ -37,13 +38,13 @@ export default function Navbar({
           <>
             <Link
               href="/login"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              className="px-5 py-2 bg-linear-to-r from-blue-500 to-blue-600 text-white font-medium rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105"
             >
               Login
             </Link>
             <Link
               href="/register"
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+              className="px-5 py-2 bg-linear-to-r from-green-500 to-green-600 text-white font-medium rounded-lg shadow-md hover:from-green-600 hover:to-green-700 transition transform hover:scale-105"
             >
               Signup
             </Link>

@@ -42,7 +42,7 @@ export default function JoinGame() {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-200 via-gray-200 to-zinc-300">
       <div className="w-full max-w-sm mx-auto bg-white p-8 rounded-xl shadow-md">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
           Join a game

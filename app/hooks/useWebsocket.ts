@@ -29,7 +29,7 @@ export default function useWebsocket(
 
       // on ws connects
       ws.onopen = () => {
-        console.log("websocket connected:", url);
+        console.log("websocket connected");
       };
 
       ws.onmessage = (event) => {
@@ -39,7 +39,7 @@ export default function useWebsocket(
 
       // on ws disconnects
       ws.onclose = () => {
-        console.log("Websocket disconnected", url);
+        console.log("Websocket disconnected");
       };
 
       // on ws errors

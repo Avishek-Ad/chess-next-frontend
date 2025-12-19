@@ -1,12 +1,18 @@
+// components/CreateGameModal.tsx
 "use client";
+
+import { LoaderCircle } from "lucide-react";
 import useShowMessage from "@/app/hooks/useShowMessage";
 import useWebsocket from "@/app/hooks/useWebsocket";
 import apiService from "@/app/services/apiService";
-import { LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function CreateGame() {
+interface CreateGameModalProps {
+  onClose: () => void;
+}
+
+export default function CreateGameModal({ onClose }: CreateGameModalProps) {
   const router = useRouter();
   const { setMessage } = useShowMessage();
 
@@ -25,7 +31,6 @@ export default function CreateGame() {
   }, []);
 
   const { sendMove } = useWebsocket("/ws/find-game/", (data) => {
-    console.log("afsdjasedofijoasfjidojwfsda",data);
     if (data.gameid){
       setMessage(false, "A Match was Found Successfully.")
       router.push(`/chess/${data.gameid}`)
@@ -37,14 +42,21 @@ export default function CreateGame() {
     await apiService.postwithoutdata('/api/chess/quit-waiting-for-a-random-game/')
     setMessage(
       false,
-      "Sorry not many players what to play a random game currently try again"
+      "Sorry, not many players want to play a random game currently. Try again."
     );
-    router.push("/");
+     onClose();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md mx-auto bg-white p-6 rounded-2xl shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={handleQuit} // click outside closes
+      />
+
+      {/* Modal Box */}
+      <div className="relative z-10 w-full max-w-md bg-white p-6 rounded-2xl shadow-lg">
         <div className="flex flex-col items-center justify-center gap-4 text-gray-700 w-full">
           <LoaderCircle className="animate-spin" size={36} />
           <span className="font-medium">Waiting for a match...</span>

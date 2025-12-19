@@ -8,6 +8,7 @@ import apiService from "./services/apiService";
 import { getUserid } from "./lib/actions";
 import useShowMessage from "./hooks/useShowMessage";
 import { useRouter } from "next/navigation";
+import CreateGameModal from "./components/JoinRandomGameModalProps";
 
 type statusType = {
   username: string;
@@ -23,6 +24,7 @@ export default function Home() {
   const [stats, setStats] = useState<statusType | null>(null);
   const [userid, setUserid] = useState<string | null>(null);
   const [logoutTriggered, setLogoutTriggered] = useState(false);
+   const [showJoinRandomGameModal, setShowJoinRandomGameModal] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -33,9 +35,6 @@ export default function Home() {
         setStats(response);
         setUserid(uid);
       } catch (err) {
-        console.error("API fetch failed:", err);
-
-        // fallback values
         setStats({
           username: "Guest",
           total_game_played: 0,
@@ -51,16 +50,15 @@ export default function Home() {
   }, [logoutTriggered]);
 
   const handleRandomGameButton = () => {
-    // href="/joining-a-random-game"
     if (userid) {
-      router.push("/joining-a-random-game");
+      setShowJoinRandomGameModal(true)
     } else {
-      setMessage(true, "Please Login in first");
+      setMessage(true, "Please login first");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50">
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-zinc-200 via-gray-200 to-zinc-300">
       {/* Navbar */}
       <Navbar
         username={stats?.username}
@@ -68,9 +66,9 @@ export default function Home() {
         setLogoutTriggered={setLogoutTriggered}
       />
 
-      {/* Content */}
-      <div className="flex flex-col grow items-center justify-center px-4 py-6">
-        {/* Stats box */}
+      {/* Main Content */}
+      <main className="flex flex-col grow items-center justify-center px-4 py-5">
+        {/* Stats */}
         <StatsBox
           username={stats?.username}
           gamesPlayed={stats?.total_game_played}
@@ -79,32 +77,47 @@ export default function Home() {
           draws={stats?.total_game_draw}
         />
 
-        {/* Main buttons */}
-        <div className="flex flex-col gap-6 mt-6 w-full max-w-xl">
+        {/* Action Area */}
+        <section className="mt-10 w-full max-w-2xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link
               href="/create-game"
-              className="col-span-1 px-8 py-6 bg-blue-600 text-white rounded-2xl text-lg font-semibold shadow-lg hover:bg-blue-500 transition flex justify-center items-center"
+              className="group relative px-8 py-6 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-3xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all flex justify-center items-center"
             >
               Create a Game
+              <span className="absolute inset-0 rounded-3xl ring-2 ring-blue-400 opacity-0 group-hover:opacity-100 transition" />
             </Link>
 
             <Link
               href="/join-game"
-              className="col-span-1 px-8 py-6 bg-green-600 text-white rounded-2xl text-lg font-semibold shadow-lg hover:bg-green-500 transition flex justify-center items-center"
+              className="group relative px-8 py-6 bg-linear-to-r from-emerald-600 to-emerald-500 text-white rounded-3xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all flex justify-center items-center"
             >
               Join a Game
+              <span className="absolute inset-0 rounded-3xl ring-2 ring-emerald-400 opacity-0 group-hover:opacity-100 transition" />
             </Link>
           </div>
 
           <button
             onClick={handleRandomGameButton}
-            className="px-8 py-6 bg-green-600 text-white rounded-2xl text-lg font-semibold shadow-lg hover:bg-green-500 transition flex justify-center items-center"
+            className="group relative mt-4 w-full px-8 py-6
+                      bg-linear-to-r from-emerald-700 to-emerald-600
+                      text-white rounded-3xl text-lg font-semibold
+                      shadow-lg hover:shadow-xl
+                      transition-all flex justify-center items-center
+                      focus:outline-none"
           >
-            Join a Random Game
+            🎲 Join a Random Game
+
+            {/* Hover ring overlay (same as Link) */}
+            <span className="pointer-events-none absolute inset-0 rounded-3xl
+                            ring-2 ring-emerald-400 opacity-0
+                            group-hover:opacity-100
+                            transition" />
           </button>
-        </div>
-      </div>
+        </section>
+
+        {showJoinRandomGameModal && <CreateGameModal onClose={() => setShowJoinRandomGameModal(false)} />}
+      </main>
     </div>
   );
 }
