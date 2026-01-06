@@ -44,6 +44,9 @@ export default function ChessGame({
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [highlightSquares, setHighlightSquares] = useState<string[]>([]);
 
+  // for promotion handling
+  const [pendingMove, setPendingMove] = useState<{from: Square, to: Square} | null>(null)
+
   const orientationRef = useRef(orientation);
   useEffect(() => {
     orientationRef.current = orientation;
@@ -116,7 +119,12 @@ export default function ChessGame({
     return result;
   };
 
-  const { sendMove } = useWebsocket(`/ws/chess/${gameid}/`, (data) => {
+  const { sendMove } = useWebsocket(`/ws/chess/${gameid}/`, (data) => {// if (
+    //   data.move.piece === "p" &&
+    //   (data.move.to.endsWith("8") || data.move.to.endsWith("1"))
+    // ) {
+    //   moveInfo.promotion = "q";
+    // }
     // console.log("Move received from server:", data);
     if (!game) {
       // console.warn("Game not ready yet, buffering move:", data);
@@ -167,13 +175,12 @@ export default function ChessGame({
       from: data.move.from,
       to: data.move.to,
     };
+    console.log("I RECEIVED A MOVE :", data)
 
     // Only promotes if the pawn reaches the last rank
-    if (
-      data.move.piece === "p" &&
-      (data.move.to.endsWith("8") || data.move.to.endsWith("1"))
-    ) {
-      moveInfo.promotion = "q";
+    if (data.move.promotion) {
+      console.log("PROMOTING", data.move)
+      moveInfo.promotion = data.move.promotion;
     }
     // console.log("WHY INVALID: ", moveInfo);
     game.move(moveInfo);
@@ -220,7 +227,9 @@ export default function ChessGame({
       ((piece.color === "w" && targetSquare.endsWith("8")) ||
         (piece.color === "b" && targetSquare.endsWith("1")))
     ) {
-      moveInfo.promotion = "q"; // promote to queen
+      // moveInfo.promotion = "q"; // promote to queen
+      setPendingMove({from: sourceSquare, to:targetSquare})
+      return true
     }
     const move = makeAMove(moveInfo);
 
@@ -239,8 +248,40 @@ export default function ChessGame({
       from: sourceSquare,
       to: targetSquare,
       player: orientation,
+      promotion: moveInfo.promotion ?? null
     });
 
+    finishMoveSetup()
+    // console.log("Move made, LOCAL CHECK:", move);
+    return true;
+  };
+
+  const onPromotionPieceSelect = (piece? : string) => {
+    if (piece && pendingMove) {
+      const promotionPiece = piece[1].toLowerCase() ?? "q"
+
+      const move = makeAMove({
+        from: pendingMove.from,
+        to: pendingMove.to,
+        promotion: promotionPiece
+      } as any);
+
+      if (move) {
+        sendMove({
+          from: pendingMove.from,
+          to: pendingMove.to,
+          player: orientation,
+          promotion: promotionPiece,
+        })
+
+        finishMoveSetup();
+      }
+    }
+    setPendingMove(null);
+    return true;
+  }
+
+  const finishMoveSetup = () => {
     // clearing the highlighted squares
     setSelectedSquare(null);
     setHighlightSquares([]);
@@ -252,10 +293,7 @@ export default function ChessGame({
     const nextTurn = game.turn() === "w" ? "white" : "black";
     // console.log("WHOSE TURN IS IT, LOCAL CHECK", nextTurn);
     setTurn(nextTurn);
-
-    // console.log("Move made, LOCAL CHECK:", move);
-    return true;
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -366,6 +404,7 @@ export default function ChessGame({
           position={position}
           onPieceDrop={onDrop}
           onSquareClick={onSquareClick}
+          onPromotionPieceSelect={onPromotionPieceSelect}
           boardOrientation={orientation}
           animationDuration={200}
           customSquareStyles={{
